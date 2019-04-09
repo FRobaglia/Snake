@@ -56,8 +56,8 @@ let player = {
 };
 
 function gameLoop() {
-  const luckyNumber = Math.floor(Math.random() * 70);
-  if (luckyNumber === Math.floor(Math.random() * 70) && !game.bonus) {
+  const luckyNumber = Math.floor(Math.random() * 700);
+  if (luckyNumber === Math.floor(Math.random() * 700) && !game.bonus) {
     game.bonus = new Bonus
     game.bonus.spawn()
   }
