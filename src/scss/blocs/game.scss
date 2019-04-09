@@ -1,0 +1,27 @@
+.game {
+  position: relative;
+  margin: 10px auto;
+  width: 400px;
+  height: 400px;
+  background: wheat;
+}
+h1 {
+  font-size: 40px;
+  font-family: monospace;
+  text-align: center;
+}
+.snake {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+}
+
+.apple {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+}
