@@ -1,119 +1,188 @@
-let player = {
-  DOM: document.querySelector('.snake'),
-  xPos: 0,
-  yPos: 0,
-  score: 0,
-  tails: [],
-  direction: 'right',
+class Apple {
+  constructor() {
+    this.DOM = document.createElement("div"),
+    this.xPos = Math.floor(Math.random() * 20) * 20,
+    this.yPos = Math.floor(Math.random() * 20) * 20
+  }
+
+  newPos() {
+    this.xPos = Math.floor(Math.random() * 20) * 20,
+    this.yPos = Math.floor(Math.random() * 20) * 20
+  }
+
+  spawn() {
+    this.DOM.classList.add("apple");
+    this.DOM.style.top = `${this.yPos}px`;
+    this.DOM.style.left = `${this.xPos}px`;
+    game.DOM.appendChild(this.DOM);
+    game.apples.push(this);
+  }
+
+  eat(value) {
+    this.DOM.remove();
+    player.score += value;
+    document.querySelector("h1").innerHTML = player.score;
+  }
 }
+
+class Bonus extends Apple {
+  spawn() {
+    this.DOM.classList.add("bonus");
+    this.DOM.style.top = `${this.yPos}px`;
+    this.DOM.style.left = `${this.xPos}px`;
+    game.DOM.appendChild(this.DOM);
+  }
+}
+
+
 
 let game = {
-  appleTime: 15,
+  appleValue: 1,
+  bonusValue: undefined,
+  directions: ["right", "left", "up", "down"],
+  speed: 100,
   apples: [],
-  DOM: document.querySelector('.game'),
-}
+  DOM: document.querySelector(".game"),
+  bonus: undefined,
+};
 
-let detectKeyPress = () => {
-  window.addEventListener('keydown', (event) => {
-    switch (event.keyCode) {
-      case 37:
-        if (player.direction !== 'right') {
-        player.direction = 'left'
-        }
-      break
-      case 38:
-        if (player.direction !== 'down') {
-          player.direction = 'up'
-        }
-      break
-      case 39:
-        if (player.direction !== 'left') {
-          player.direction = 'right'
-        }
-      break
-      case 40:
-        if (player.direction !== 'up') {
-          player.direction = 'down'
-        }
-      break
-      case 32:
-        console.log(player.xPos, player.yPos)
-    }
-  })
-}
+let player = {
+  DOM: document.querySelector(".snake"),
+  xPos: Math.floor(Math.random() * 20) * 20,
+  yPos: Math.floor(Math.random() * 20) * 20,
+  score: 0,
+  tails: [],
+  direction: game.directions[Math.floor(Math.random() * game.directions.length)]
+};
 
-let gameLoop = () => {
-  game.appleTime++
-  if (game.appleTime === 20) {
-    const apple = {
-      DOM: document.createElement('div'),
-      xPos: Math.floor(Math.random() * 20) * 20,
-      yPos: Math.floor(Math.random() * 20) * 20,
-    }
-    apple.DOM.classList.add('apple')
-    apple.DOM.style.top = `${apple.yPos}px`
-    apple.DOM.style.left = `${apple.xPos}px`
-    game.DOM.appendChild(apple.DOM)
-    game.apples.push(apple)
+function gameLoop() {
+  const luckyNumber = Math.floor(Math.random() * 70);
+  if (luckyNumber === Math.floor(Math.random() * 70) && !game.bonus) {
+    game.bonus = new Bonus
+    game.bonus.spawn()
+  }
+  const tail = {
+    DOM: document.createElement("div"),
+    xPos: player.xPos,
+    yPos: player.yPos
+  };
+  tail.DOM.classList.add("tail");
+  tail.DOM.style.top = tail.yPos + "px";
+  tail.DOM.style.left = tail.xPos + "px";
+  game.DOM.appendChild(tail.DOM);
+  player.tails.push(tail);
+  setTimeout(() => {
+    tail.DOM.remove();
+    player.tails.splice(0, 1);
+  }, game.speed * (player.score + 2));
 
-    console.log(apple.xPos, apple.yPos)
-
-    game.appleTime = 0
+  if (!game.apples.length) {
+    const apple = new Apple
+    player.tails.forEach(tail => {
+      while (apple.xPos === tail.xPos || apple.yPos === tail.yPos) {
+        apple.newPos()
+      }
+    });
+    apple.spawn();
   }
 
   switch (player.direction) {
-    case 'left':
+    case "left":
       if (player.xPos > 0) {
-      player.xPos -= 20
+        player.xPos -= 20;
+      } else {
+        player.xPos = 380;
       }
-      break
-    case 'right': 
-    if (player.xPos < 380) {
-      player.xPos += 20
+      break;
+    case "right":
+      if (player.xPos < 380) {
+        player.xPos += 20;
+      } else {
+        player.xPos = 0;
       }
-      break
-    case 'up' :
-    if (player.yPos > 0) {
-      player.yPos -= 20
+      break;
+    case "up":
+      if (player.yPos > 0) {
+        player.yPos -= 20;
+      } else {
+        player.yPos = 380;
       }
-      break
-    case 'down' :
-    if (player.yPos < 380) {
-      player.yPos += 20
+      break;
+    case "down":
+      if (player.yPos < 380) {
+        player.yPos += 20;
+      } else {
+        player.yPos = 0;
       }
-      break
+      break;
     default:
-      console.log('player.direction should be left, up, down or right')
+      console.log("player.direction should be left, up, down or right");
   }
-  player.DOM.style.left = `${player.xPos}px` 
-  player.DOM.style.top = `${player.yPos}px`
 
+  player.DOM.style.left = `${player.xPos}px`;
+  player.DOM.style.top = `${player.yPos}px`;
+
+  checkCollisions();
+  console.log(game.apples)
+
+  setTimeout(gameLoop, game.speed);
+};
+
+function checkCollisions() {
   game.apples.forEach(apple => {
     if (player.xPos === apple.xPos && player.yPos === apple.yPos) {
-      apple.DOM.remove()
-      player.score++
-      const tail = {
-        DOM: document.createElement('div'),
-        xPos: player.xPos,
-        yPos: player.yPos
-      }
-      tail.DOM.classList.add('snake')
-      tail.style.top = tail.yPos + 'px'
-      tail.style.left = tail.xPos + 'px'
-      game.DOM.appendChild(tail)
-      player.tails.push(tail)
-      document.querySelector('h1').innerHTML = player.score
+      apple.eat(game.appleValue);
+      game.apples = [];
     }
   });
 
-  setTimeout(gameLoop, 100 - player.score);
-}
+  if (game.bonus && player.xPos === game.bonus.xPos && player.yPos === game.bonus.yPos) {
+    game.bonus.eat(Math.floor(Math.random() * 5 + 5));
+    game.bonus = undefined;
+  }
 
-let init = () => {
-  detectKeyPress()
-  gameLoop()
-}
+  player.tails.forEach(tail => {
+    if (tail.xPos === player.xPos && tail.yPos === player.yPos) {
+      gameOver();
+    }
+  });
+};
 
-init()
+function gameOver() {
+  player.tails.forEach(tail => {
+    tail.DOM.remove()
+  })
+  player.score = 0;
+  document.querySelector("h1").innerHTML = player.score;
+};
 
-//check le landing du snake a chaque fois et mettre une tail qui se supprimera dans "score" time
+function init() {
+  window.addEventListener("keydown", event => {
+    switch (event.keyCode) {
+      case 37:
+        if (player.direction !== "right") {
+          player.direction = "left";
+        }
+        break;
+      case 38:
+        if (player.direction !== "down") {
+          player.direction = "up";
+        }
+        break;
+      case 39:
+        if (player.direction !== "left") {
+          player.direction = "right";
+        }
+        break;
+      case 40:
+        if (player.direction !== "up") {
+          player.direction = "down";
+        }
+        break;
+    }
+  });
+  gameLoop();
+};
+
+
+init();

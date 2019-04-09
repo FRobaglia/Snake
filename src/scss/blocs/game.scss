@@ -1,9 +1,31 @@
+@keyframes rainbow {
+  20% {
+    background-color: orange;
+  }
+  40% {
+    background-color: lightgreen;
+  }
+  60% {
+    background-color: cyan;
+  }
+  80% {
+    background-color: yellow;
+  }
+  to {
+    background-color: rgb(70, 69, 69);
+  }
+}
+
+body {
+  background-color: #c8d6e5;
+}
+
 .game {
   position: relative;
-  margin: 10px auto;
+  margin: 50px auto;
   width: 400px;
   height: 400px;
-  background: wheat;
+  background: #A3CB38;
 }
 h1 {
   font-size: 40px;
@@ -16,7 +38,16 @@ h1 {
   left: 0;
   width: 20px;
   height: 20px;
-  background-color: green;
+  background-color: #009432;
+}
+
+.tail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #009432;
 }
 
 .apple {
@@ -24,4 +55,12 @@ h1 {
   width: 20px;
   height: 20px;
   background-color: red;
+}
+
+.bonus {
+  background-color: rgb(70, 69, 69);
+  animation: rainbow 1s infinite;
+  position: absolute;
+  width: 20px;
+  height: 20px;
 }
