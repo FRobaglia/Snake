@@ -3,7 +3,7 @@ let player = {
   xPos: 0,
   yPos: 0,
   score: 0,
-  squares: 1,
+  tails: [],
   direction: 'right',
 }
 
@@ -92,6 +92,16 @@ let gameLoop = () => {
     if (player.xPos === apple.xPos && player.yPos === apple.yPos) {
       apple.DOM.remove()
       player.score++
+      const tail = {
+        DOM: document.createElement('div'),
+        xPos: player.xPos,
+        yPos: player.yPos
+      }
+      tail.DOM.classList.add('snake')
+      tail.style.top = tail.yPos + 'px'
+      tail.style.left = tail.xPos + 'px'
+      game.DOM.appendChild(tail)
+      player.tails.push(tail)
       document.querySelector('h1').innerHTML = player.score
     }
   });
@@ -105,3 +115,5 @@ let init = () => {
 }
 
 init()
+
+//check le landing du snake a chaque fois et mettre une tail qui se supprimera dans "score" time
