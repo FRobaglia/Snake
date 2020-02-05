@@ -50,12 +50,14 @@ let player = {
   DOM: document.querySelector(".snake"),
   xPos: Math.floor(Math.random() * 20) * 20,
   yPos: Math.floor(Math.random() * 20) * 20,
+  canChangeDirection: true,
   score: 0,
   tails: [],
   direction: game.directions[Math.floor(Math.random() * game.directions.length)]
 };
 
 function gameLoop() {
+  player.canChangeDirection = true
   const luckyNumber = Math.floor(Math.random() * 700);
   if (luckyNumber === Math.floor(Math.random() * 700) && !game.bonus) {
     game.bonus = new Bonus
@@ -86,44 +88,45 @@ function gameLoop() {
     apple.spawn();
   }
 
-  switch (player.direction) {
-    case "left":
-      if (player.xPos > 0) {
-        player.xPos -= 20;
-      } else {
-        player.xPos = 380;
-      }
-      break;
-    case "right":
-      if (player.xPos < 380) {
-        player.xPos += 20;
-      } else {
-        player.xPos = 0;
-      }
-      break;
-    case "up":
-      if (player.yPos > 0) {
-        player.yPos -= 20;
-      } else {
-        player.yPos = 380;
-      }
-      break;
-    case "down":
-      if (player.yPos < 380) {
-        player.yPos += 20;
-      } else {
-        player.yPos = 0;
-      }
-      break;
-    default:
-      console.log("player.direction should be left, up, down or right");
+  if (player.canChangeDirection) {
+    switch (player.direction) {
+      case "left":
+        if (player.xPos > 0) {
+          player.xPos -= 20;
+        } else {
+          player.xPos = 380;
+        }
+        break;
+      case "right":
+        if (player.xPos < 380) {
+          player.xPos += 20;
+        } else {
+          player.xPos = 0;
+        }
+        break;
+      case "up":
+        if (player.yPos > 0) {
+          player.yPos -= 20;
+        } else {
+          player.yPos = 380;
+        }
+        break;
+      case "down":
+        if (player.yPos < 380) {
+          player.yPos += 20;
+        } else {
+          player.yPos = 0;
+        }
+        break;
+      default:
+        console.log("player.direction should be left, up, down or right");
+    }
   }
 
   player.DOM.style.left = `${player.xPos}px`;
   player.DOM.style.top = `${player.yPos}px`;
 
   checkCollisions();
-  console.log(game.apples)
 
   setTimeout(gameLoop, game.speed);
 };
@@ -158,27 +161,32 @@ function gameOver() {
 
 function init() {
   window.addEventListener("keydown", event => {
-    switch (event.keyCode) {
-      case 37:
-        if (player.direction !== "right") {
-          player.direction = "left";
-        }
-        break;
-      case 38:
-        if (player.direction !== "down") {
-          player.direction = "up";
-        }
-        break;
-      case 39:
-        if (player.direction !== "left") {
-          player.direction = "right";
-        }
-        break;
-      case 40:
-        if (player.direction !== "up") {
-          player.direction = "down";
-        }
-        break;
+    if (player.canChangeDirection) {
+      switch (event.keyCode) {
+        case 37:
+          if (player.direction !== "right") {
+            player.direction = "left";
+          }
+          break;
+        case 38:
+          if (player.direction !== "down") {
+            player.direction = "up";
+          }
+          break;
+        case 39:
+          if (player.direction !== "left") {
+            player.direction = "right";
+          }
+          break;
+        case 40:
+          if (player.direction !== "up") {
+            player.direction = "down";
+          }
+          break;
+      }
+      player.canChangeDirection = false
+    } else {
+      console.log('Player already made a move choice this frame.')
     }
   });
   gameLoop();
